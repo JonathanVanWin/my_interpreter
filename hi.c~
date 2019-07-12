@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+typedef struct{
+    int x;
+    int *y;
+} Point;
+Point ps[30];
+void func(){
+    ps[0].x=1;
+    int *ab =malloc(sizeof(int)*3);
+    ps[0].y = ab;
+    printf("Point 0: x: %d, y: %s", ps[0].x, "Hi");
+}
+int main(){
+    func();
+}
