@@ -6,6 +6,10 @@
 
 const char keywords[KEYWORD_COUNT][6] = {"var", "print"};
 
+void token_init(Token *token){
+    token->value.c='\0';
+    token->type=NONE;
+}
 void printk(Token token, char *end){
     char *format = malloc(2+strlen(end)+1);
     if(!format)
@@ -197,42 +201,27 @@ void parseWord(char *str){
         str++;
     }
     Tree *root = malloc(sizeof(Tree)); 
-    root->next = NULL;
-    root->child= NULL;
+    tree_init(root, 1); 
     Tree *current = root;
     Tree **addPtrs = malloc(10*sizeof(Tree*));
-    int flagInc=0;
+    int flagInc=0, addIndex =-1;
     for(int i=0; i<tokenCount; i++){
         switch(tokens[i]->type){
             case NUMBER:
-                //Has at least ;
-                    if(tokens[i+1]->type==ADDITION){             
-                        current->token.value.c='+';
-                        current->token.type=ADDITION;
-                        current->child=malloc(sizeof(Tree));
-                        current=current->child;     
-                        flagInc++;
-                    }
-                    current->token.value.i=tokens[i]->value.i;
-                    current->token.type=NUMBER;
-                    if(flagInc){
-                        //Next will be sure another part of the expression (A num or a +-*/)
-                        current->next = malloc(sizeof(Tree));
-                        current->child= NULL;   
-                        current=current->next;
-                        i+=flagInc;
-                        flagInc=0;
-                    } else {
-                        current->next = NULL;
-                        current->child= malloc(sizeof(Tree));
-                        current=current->child;
-                    }
+                addChild(current, tokens[i]);
                 break;
             case STRING_LITERAL:
                 break;
             case ADDITION:
-                printf("Addition");break;
-                 //addChild(root, tokens[i]);
+                if(addIndex==-1){
+                    addIndex=0;
+                    if(current->token.type==NONE){
+                        current->token=tokens[i]->type;                       
+                        addPtrs[addIndex]=current;
+                    }
+                    tree_init(addPtrs[addIndex], 0);
+                }
+                root->token=*tokens[i]; 
             case SEMI_COLON: 
                  break;
         }   
